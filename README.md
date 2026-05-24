@@ -14,12 +14,13 @@ It is more aggressive than Caveman-style compression. Caveman speaks less; Agent
 
 ## Supported Agents / Tools
 
-This repo is no longer Kiro-only. It ships adapters for common agent instruction formats:
+This repo ships adapters for common agent instruction formats:
 
 | Target | File |
 | --- | --- |
-| Universal skill loaders / SkillsMP-style repos | `skills/right-to-silence/SKILL.md` |
+| OpenAI Codex Skills | `.agents/skills/codex-agent-miranda/SKILL.md` |
 | Codex / OpenCode / AGENTS.md-compatible coding agents | `AGENTS.md` |
+| Universal skill loaders / SkillsMP-style repos | `skills/right-to-silence/SKILL.md` |
 | Claude Code project memory | `CLAUDE.md` |
 | Claude Code slash command | `.claude/commands/silence.md` |
 | Gemini CLI project memory | `GEMINI.md` |
@@ -30,6 +31,10 @@ This repo is no longer Kiro-only. It ships adapters for common agent instruction
 
 Use any of these to activate silent mode:
 
+- `Codex Agent Miranda`
+- `Codex Miranda`
+- `Codex Right to Silence`
+- `Codex 緘默權`
 - `緘默權`
 - `silent mode`
 - `no talk just do`
@@ -127,15 +132,24 @@ When breaking silence, use `[DANGER]` only. No essay.
 
 ## Installation
 
-### Universal skill loader
+### OpenAI Codex Skills
 
-Copy the skill directory:
+Codex Skills are loaded from `.agents/skills/<skill-name>/SKILL.md` inside the repo.
 
-```bash
-cp -r skills/right-to-silence <your-skills-dir>/
+This repo includes a Codex-named skill:
+
+```text
+.agents/skills/codex-agent-miranda/SKILL.md
 ```
 
-### Codex / OpenCode / AGENTS.md-compatible agents
+Install into another repo:
+
+```bash
+mkdir -p /path/to/project/.agents/skills
+cp -r .agents/skills/codex-agent-miranda /path/to/project/.agents/skills/
+```
+
+### Codex project instructions / AGENTS.md-compatible agents
 
 Copy or merge the root instruction file into your target project:
 
@@ -144,6 +158,14 @@ cp AGENTS.md /path/to/project/AGENTS.md
 ```
 
 If the project already has an `AGENTS.md`, append the **Right to Silence** section instead of replacing the file.
+
+### Universal skill loader
+
+Copy the skill directory:
+
+```bash
+cp -r skills/right-to-silence <your-skills-dir>/
+```
 
 ### Claude Code
 
@@ -188,6 +210,32 @@ cp .kiro/agents/right-to-silence.md ~/.kiro/agents/
 # or workspace-level
 mkdir -p .kiro/agents
 cp .kiro/agents/right-to-silence.md .kiro/agents/
+```
+
+## File Structure
+
+```text
+agent-miranda/
+├── README.md
+├── AGENTS.md
+├── CLAUDE.md
+├── GEMINI.md
+├── .agents/
+│   └── skills/
+│       └── codex-agent-miranda/
+│           └── SKILL.md
+├── skills/
+│   └── right-to-silence/
+│       └── SKILL.md
+├── .claude/
+│   └── commands/
+│       └── silence.md
+├── .cursor/
+│   └── rules/
+│       └── right-to-silence.mdc
+└── .kiro/
+    └── agents/
+        └── right-to-silence.md
 ```
 
 ## Examples
