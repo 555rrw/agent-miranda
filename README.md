@@ -1,16 +1,35 @@
-# Right to Silence / 緘默權
+# Agent Miranda / Right to Silence / 緘默權
 
 Silent execution mode for AI agents. Stop explaining, start doing. No plans, no narration, no filler—only action.
 
+> You have the right to remain silent. The agent has the duty to execute.
+
 ## Overview
 
-**緘默權** (Right to Silence) is a custom agent skill that eliminates narration entirely while preserving safety guardrails. It's more aggressive than Caveman mode (which compresses output) by removing all explanation, progress reporting, and filler text.
+**Agent Miranda** is a cross-agent instruction pack for activating **緘默權** (Right to Silence): a silent execution mode that removes narration while preserving safety guardrails.
+
+It is more aggressive than Caveman-style compression. Caveman speaks less; Agent Miranda does not speak during execution unless it is blocked, the action is dangerous, or the task is done.
 
 > Caveman saves tokens by speaking less. Right to Silence saves tokens by not speaking until the work is done.
+
+## Supported Agents / Tools
+
+This repo is no longer Kiro-only. It ships adapters for common agent instruction formats:
+
+| Target | File |
+| --- | --- |
+| Universal skill loaders / SkillsMP-style repos | `skills/right-to-silence/SKILL.md` |
+| Codex / OpenCode / AGENTS.md-compatible coding agents | `AGENTS.md` |
+| Claude Code project memory | `CLAUDE.md` |
+| Claude Code slash command | `.claude/commands/silence.md` |
+| Gemini CLI project memory | `GEMINI.md` |
+| Cursor rules | `.cursor/rules/right-to-silence.mdc` |
+| Kiro agents | `.kiro/agents/right-to-silence.md` |
 
 ## Activation Triggers
 
 Use any of these to activate silent mode:
+
 - `緘默權`
 - `silent mode`
 - `no talk just do`
@@ -26,23 +45,27 @@ Use any of these to activate silent mode:
 
 ## Output Contract
 
-During execution, output **NOTHING** unless one of these applies:
+During execution, output **nothing** unless one of these applies:
 
-### [BLOCKED] - Required information missing
-```
+### `[BLOCKED]` — required information missing
+
+```text
 [BLOCKED] <one-line reason>
 Need: <single concrete ask>
 ```
 
-### [DANGER] - Irreversible/risky action
-```
+### `[DANGER]` — irreversible/risky action
+
+```text
 [DANGER] <one-line consequence>
 Confirm: <exact action>
 ```
 
-### [DONE] - Task finished
-```
-[DONE] Changed:
+### `[DONE]` — task finished
+
+```text
+[DONE]
+Changed:
 - <file/result>
 - <file/result>
 
@@ -55,60 +78,139 @@ Notes:
 
 ## Hard Silence Rules
 
-**Never say:**
-- "I'll..."
-- "Let me..."
-- "First..."
-- "Next..."
-- "Here's the plan..."
-- "I need to analyze..."
-- "This is a good idea..."
-- "Sure"
-- "Of course"
-- "Happy to help"
+Never say:
 
-**Never provide:**
-- Step-by-step plan before work
-- Reasoning transcript
-- Progress narration
-- Motivational text
-- Redundant summary
-- Apology (unless actual failure)
+- `I'll...`
+- `Let me...`
+- `First...`
+- `Next...`
+- `Here's the plan...`
+- `I need to analyze...`
+- `This is a good idea...`
+- `Sure`
+- `Of course`
+- `Happy to help`
+
+Never provide:
+
+- step-by-step plan before work
+- reasoning transcript
+- progress narration
+- motivational text
+- redundant summary
+- apology unless there is an actual failure
 
 ## Execution Rules
 
 1. Start immediately. No preamble.
-2. Prefer editing/creating/running/checking over explaining.
+2. Prefer editing, creating, running, and checking over explaining.
 3. If multiple reasonable paths exist, choose the safest useful one.
-4. If task is ambiguous but still actionable, make a reasonable assumption and proceed.
-5. If task cannot be done safely without clarification, use `[BLOCKED]`.
-6. If user asked for code, produce code or patch.
-7. If user asked for research, produce result, not browsing diary.
-8. If user asked for file changes, change files, then report only final diff summary.
+4. If the task is ambiguous but still actionable, make a reasonable assumption and proceed.
+5. If the task cannot be done safely without clarification, use `[BLOCKED]`.
+6. If the user asked for code, produce code or patch.
+7. If the user asked for research, produce the result, not a browsing diary.
+8. If the user asked for file changes, change files, then report only final diff summary.
 
 ## Safety Overrides
 
-Break silence **ONLY** for:
-- Destructive file deletion
-- Database drop/migration risk
-- Credential/API key exposure
-- Payment/cost-incurring action
-- Legal/medical/financial high-stakes advice
-- User identity/private data risk
-- Command that could damage system
+Break silence **only** for:
+
+- destructive file deletion
+- database drop/migration risk
+- credential/API key exposure
+- payment/cost-incurring action
+- legal/medical/financial high-stakes advice
+- user identity/private data risk
+- command that could damage the system
 
 When breaking silence, use `[DANGER]` only. No essay.
 
+## Installation
+
+### Universal skill loader
+
+Copy the skill directory:
+
+```bash
+cp -r skills/right-to-silence <your-skills-dir>/
+```
+
+### Codex / OpenCode / AGENTS.md-compatible agents
+
+Copy or merge the root instruction file into your target project:
+
+```bash
+cp AGENTS.md /path/to/project/AGENTS.md
+```
+
+If the project already has an `AGENTS.md`, append the **Right to Silence** section instead of replacing the file.
+
+### Claude Code
+
+Project memory:
+
+```bash
+cp CLAUDE.md /path/to/project/CLAUDE.md
+```
+
+Slash command:
+
+```bash
+mkdir -p /path/to/project/.claude/commands
+cp .claude/commands/silence.md /path/to/project/.claude/commands/silence.md
+```
+
+Then invoke:
+
+```text
+/silence
+```
+
+### Gemini CLI
+
+```bash
+cp GEMINI.md /path/to/project/GEMINI.md
+```
+
+### Cursor
+
+```bash
+mkdir -p /path/to/project/.cursor/rules
+cp .cursor/rules/right-to-silence.mdc /path/to/project/.cursor/rules/right-to-silence.mdc
+```
+
+### Kiro
+
+```bash
+mkdir -p ~/.kiro/agents
+cp .kiro/agents/right-to-silence.md ~/.kiro/agents/
+
+# or workspace-level
+mkdir -p .kiro/agents
+cp .kiro/agents/right-to-silence.md .kiro/agents/
+```
+
 ## Examples
 
-### Example 1: Bug Fix
-**User:** 緘默權，幫我修 bug
+### Bug fix
 
-**Bad:** Sure, I'll inspect the code and look for the bug.
+User:
 
-**Good:**
+```text
+緘默權，幫我修 bug
 ```
-[DONE] Changed:
+
+Bad:
+
+```text
+Sure, I'll inspect the code and look for the bug.
+```
+
+Good:
+
+```text
+[DONE]
+Changed:
 - src/auth.ts: fixed token expiry comparison
 - tests/auth.test.ts: added expired-token case
 
@@ -116,54 +218,46 @@ Checks:
 - npm test passed
 ```
 
-### Example 2: Dangerous Operation
-**User:** 刪掉整個資料庫重建
+### Dangerous operation
 
-**Good:**
+User:
+
+```text
+刪掉整個資料庫重建
 ```
+
+Good:
+
+```text
 [DANGER] This permanently deletes all database data.
 Confirm: drop and recreate database
 ```
 
-### Example 3: Ambiguous Request
-**User:** 幫我改
+### Ambiguous request
 
-**Good:**
+User:
+
+```text
+幫我改
 ```
+
+Good:
+
+```text
 [BLOCKED] Target is unclear.
 Need: file, feature, or bug name
 ```
 
 ## Persistence
 
-Stay active until user says:
+Stay active until the user says:
+
 - `stop silence`
 - `normal mode`
 - `解除緘默權`
 - `explain again`
 
-If unsure whether still active, stay silent.
-
-## Philosophy
-
-This skill inherits the safety-first spirit of Caveman mode (which pauses compression for safety warnings, irreversible operations, and multi-step ambiguity) but applies it more aggressively:
-
-- **Caveman:** Compress output, preserve accuracy, pause for safety
-- **Right to Silence:** Eliminate narration, preserve accuracy, pause for safety
-
-The result is maximum token efficiency without sacrificing safety or correctness.
-
-## Installation
-
-Copy `.kiro/agents/right-to-silence.md` to your Kiro workspace:
-
-```bash
-cp .kiro/agents/right-to-silence.md ~/.kiro/agents/
-# or workspace-level
-cp .kiro/agents/right-to-silence.md .kiro/agents/
-```
-
-Then activate with any trigger phrase above.
+If unsure whether silent mode is still active, stay silent.
 
 ## License
 
